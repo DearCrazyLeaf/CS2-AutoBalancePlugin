@@ -8,8 +8,8 @@ namespace AutoBalancePlugin;
 public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConfig>
 {
     public override string ModuleName => "Auto Balance Plugin";
-    public override string ModuleVersion => "0.4.2";
-    public override string ModuleAuthor => "hTx";
+    public override string ModuleVersion => "0.5.0";
+    public override string ModuleAuthor => "hTx & GSM-RO";
     
     public AutoBalancePluginConfig Config { get; set; } = new();
 
@@ -126,9 +126,9 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
                 ? CsTeam.CounterTerrorist
                 : CsTeam.Terrorist;
             
-            var teamAbbreviation = (CsTeam)playerToSend.TeamNum == CsTeam.Terrorist ? "T" :
-                (CsTeam)playerToSend.TeamNum == CsTeam.CounterTerrorist ? "CT"
-                : "Unknown";
+            var teamAbbreviation = teamToSend == CsTeam.Terrorist ? "T" :
+                       teamToSend == CsTeam.CounterTerrorist ? "CT" :
+                       "Unknown";
             
             if (_killPlayerOnSwitch)
                 playerToSend.ChangeTeam(teamToSend);
