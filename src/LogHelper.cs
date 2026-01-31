@@ -32,7 +32,7 @@ public static class LogHelper
     {
         text = text.Replace("{DEFAULT}", $"{ChatColors.Default}");
         text = text.Replace("{WHITE}", $"{ChatColors.White}");
-        text = text.Replace("{DARKRED}", $"{ChatColors.Darkred}");
+        text = text.Replace("{DARKRED}", $"{ChatColors.DarkRed}");
         text = text.Replace("{GREEN}", $"{ChatColors.Green}");
         text = text.Replace("{LIGHTYELLOW}", $"{ChatColors.LightYellow}");
         text = text.Replace("{LIGHTBLUE}", $"{ChatColors.LightBlue}");
