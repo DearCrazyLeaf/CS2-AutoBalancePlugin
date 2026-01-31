@@ -1,4 +1,4 @@
-namespace AutoBalancePlugin;
+﻿namespace AutoBalancePlugin;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API.Core;
 
@@ -20,5 +20,14 @@ public class AutoBalancePluginConfig : BasePluginConfig
     public int MaximumAllowedDifference { get; set; } = 1;
     
     [JsonPropertyName("AutoBalanceMessage")]
-    public string AutoBalanceMessage { get; set; } = " {GOLD}● [Auto Balance] {DEFAULT} -> {DEFAULT}Switched {GOLD}{_playerName} {DEFAULT}to {RED}{_switchedTeam}";
+    public string AutoBalanceMessage { get; set; } = " {GOLD}鈼?[Auto Balance] {DEFAULT} -> {DEFAULT}Switched {GOLD}{_playerName} {DEFAULT}to {RED}{_switchedTeam}";
+
+    [JsonPropertyName("AutoBalanceCommandUsageMessage")]
+    public string AutoBalanceCommandUsageMessage { get; set; } = "{GREEN}[Auto Balance]{DEFAULT} Usage: css_autobalance <on|off>";
+
+    [JsonPropertyName("AutoBalanceCommandOnMessage")]
+    public string AutoBalanceCommandOnMessage { get; set; } = "{GREEN}[Auto Balance]{DEFAULT} Auto balance ON.";
+
+    [JsonPropertyName("AutoBalanceCommandOffMessage")]
+    public string AutoBalanceCommandOffMessage { get; set; } = "{GREEN}[Auto Balance]{DEFAULT} Auto balance OFF.";
 }

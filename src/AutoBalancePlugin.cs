@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 
 namespace AutoBalancePlugin;
@@ -17,12 +18,18 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
     private bool _killPlayerOnSwitch;
     private bool _balanceOnRoundStart;
     private bool _balanceBots;
+    private bool _autoBalanceEnabled = true;
     private int _maximumAllowedDifference;
     private string _autoBalanceMessage = "";
+    private string _autoBalanceCommandUsageMessage = "";
+    private string _autoBalanceCommandOnMessage = "";
+    private string _autoBalanceCommandOffMessage = "";
 
     public override void Load(bool hotReload)
     {
         LogHelper.LogToConsole(ConsoleColor.Green, $"[Auto Balance Plugin] -> {ModuleName} version {ModuleVersion} loaded");
+
+        AddCommand("css_autobalance", "Enable/disable auto balance. Usage: css_autobalance <on|off>", OnAutoBalanceCommand);
     }
 
     public override void Unload(bool hotReload)
@@ -75,10 +82,16 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
         this._balanceBots = config.BalanceBots;
         this._maximumAllowedDifference = config.MaximumAllowedDifference;
         this._autoBalanceMessage = config.AutoBalanceMessage;
+        this._autoBalanceCommandUsageMessage = config.AutoBalanceCommandUsageMessage;
+        this._autoBalanceCommandOnMessage = config.AutoBalanceCommandOnMessage;
+        this._autoBalanceCommandOffMessage = config.AutoBalanceCommandOffMessage;
     }
 
     private void TryAutoBalance()
     {
+        if (!_autoBalanceEnabled)
+            return;
+
         var players = Utilities.GetPlayers();
         
         if (players.Count <= 0)
@@ -140,6 +153,43 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
 
             
             LogHelper.LogToChatAll(tempAutoBalanceMessage.ReplaceTags());
+        }
+    }
+
+    private void OnAutoBalanceCommand(CCSPlayerController? player, CommandInfo command)
+    {
+        var arg = command.ArgCount > 1 ? command.ArgByIndex(1) : string.Empty;
+        if (string.IsNullOrWhiteSpace(arg))
+        {
+            var usageMessage = string.IsNullOrWhiteSpace(_autoBalanceCommandUsageMessage)
+                ? "[Auto Balance Plugin] -> Usage: css_autobalance <on|off>"
+                : _autoBalanceCommandUsageMessage;
+            command.ReplyToCommand(usageMessage.ReplaceTags());
+            return;
+        }
+
+        switch (arg.Trim().ToLowerInvariant())
+        {
+            case "on":
+                _autoBalanceEnabled = true;
+                var onMessage = string.IsNullOrWhiteSpace(_autoBalanceCommandOnMessage)
+                    ? "[Auto Balance Plugin] -> Auto balance ON."
+                    : _autoBalanceCommandOnMessage;
+                command.ReplyToCommand(onMessage.ReplaceTags());
+                break;
+            case "off":
+                _autoBalanceEnabled = false;
+                var offMessage = string.IsNullOrWhiteSpace(_autoBalanceCommandOffMessage)
+                    ? "[Auto Balance Plugin] -> Auto balance OFF."
+                    : _autoBalanceCommandOffMessage;
+                command.ReplyToCommand(offMessage.ReplaceTags());
+                break;
+            default:
+                var fallbackUsageMessage = string.IsNullOrWhiteSpace(_autoBalanceCommandUsageMessage)
+                    ? "[Auto Balance Plugin] -> Usage: css_autobalance <on|off>"
+                    : _autoBalanceCommandUsageMessage;
+                command.ReplyToCommand(fallbackUsageMessage.ReplaceTags());
+                break;
         }
     }
 }
