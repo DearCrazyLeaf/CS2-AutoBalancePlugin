@@ -1,4 +1,5 @@
 ﻿namespace AutoBalancePlugin;
+using System;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API.Core;
 
@@ -20,7 +21,7 @@ public class AutoBalancePluginConfig : BasePluginConfig
     public int MaximumAllowedDifference { get; set; } = 1;
     
     [JsonPropertyName("AutoBalanceMessage")]
-    public string AutoBalanceMessage { get; set; } = " {GOLD}[Auto Balance] {DEFAULT} -> {DEFAULT}Switched {GOLD}{_playerName} {DEFAULT}to {RED}{_switchedTeam}";
+    public string AutoBalanceMessage { get; set; } = " {GOLD}鈼?[Auto Balance] {DEFAULT} -> {DEFAULT}Switched {GOLD}{_playerName} {DEFAULT}to {RED}{_switchedTeam}";
 
     [JsonPropertyName("AutoBalanceCommandUsageMessage")]
     public string AutoBalanceCommandUsageMessage { get; set; } = "{GREEN}[Auto Balance]{DEFAULT} Usage: css_autobalance <on|off>";
@@ -30,4 +31,10 @@ public class AutoBalancePluginConfig : BasePluginConfig
 
     [JsonPropertyName("AutoBalanceCommandOffMessage")]
     public string AutoBalanceCommandOffMessage { get; set; } = "{GREEN}[Auto Balance]{DEFAULT} Auto balance OFF.";
+
+    [JsonPropertyName("AutoBalanceCommandNoPermissionMessage")]
+    public string AutoBalanceCommandNoPermissionMessage { get; set; } = "{RED}[Auto Balance]{DEFAULT} You do not have permission.";
+
+    [JsonPropertyName("AutoBalanceCommandPermissions")]
+    public string[] AutoBalanceCommandPermissions { get; set; } = Array.Empty<string>();
 }

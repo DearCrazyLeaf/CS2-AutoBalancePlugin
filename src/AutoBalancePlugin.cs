@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 
@@ -24,6 +25,8 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
     private string _autoBalanceCommandUsageMessage = "";
     private string _autoBalanceCommandOnMessage = "";
     private string _autoBalanceCommandOffMessage = "";
+    private string _autoBalanceCommandNoPermissionMessage = "";
+    private string[] _autoBalanceCommandPermissions = Array.Empty<string>();
 
     public override void Load(bool hotReload)
     {
@@ -85,6 +88,8 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
         this._autoBalanceCommandUsageMessage = config.AutoBalanceCommandUsageMessage;
         this._autoBalanceCommandOnMessage = config.AutoBalanceCommandOnMessage;
         this._autoBalanceCommandOffMessage = config.AutoBalanceCommandOffMessage;
+        this._autoBalanceCommandNoPermissionMessage = config.AutoBalanceCommandNoPermissionMessage;
+        this._autoBalanceCommandPermissions = config.AutoBalanceCommandPermissions ?? Array.Empty<string>();
     }
 
     private void TryAutoBalance()
@@ -158,6 +163,15 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
 
     private void OnAutoBalanceCommand(CCSPlayerController? player, CommandInfo command)
     {
+        if (!CanUseAutoBalanceCommand(player))
+        {
+            var noPermissionMessage = string.IsNullOrWhiteSpace(_autoBalanceCommandNoPermissionMessage)
+                ? "[Auto Balance Plugin] -> You do not have permission."
+                : _autoBalanceCommandNoPermissionMessage;
+            command.ReplyToCommand(noPermissionMessage.ReplaceTags());
+            return;
+        }
+
         var arg = command.ArgCount > 1 ? command.ArgByIndex(1) : string.Empty;
         if (string.IsNullOrWhiteSpace(arg))
         {
@@ -191,5 +205,32 @@ public class AutoBalancePlugin : BasePlugin, IPluginConfig<AutoBalancePluginConf
                 command.ReplyToCommand(fallbackUsageMessage.ReplaceTags());
                 break;
         }
+    }
+
+    private bool CanUseAutoBalanceCommand(CCSPlayerController? player)
+    {
+        if (player == null)
+            return true;
+
+        if (_autoBalanceCommandPermissions.Length == 0)
+            return true;
+
+        foreach (var permission in _autoBalanceCommandPermissions)
+        {
+            var trimmed = permission?.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed))
+                continue;
+
+            if (trimmed.StartsWith("@") && AdminManager.PlayerHasPermissions(player, trimmed))
+                return true;
+
+            if (trimmed.StartsWith("#") && AdminManager.PlayerInGroup(player, trimmed))
+                return true;
+
+            if (ulong.TryParse(trimmed, out var steamId64) && player.SteamID == steamId64)
+                return true;
+        }
+
+        return false;
     }
 }
